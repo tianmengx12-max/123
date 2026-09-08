@@ -1,0 +1,108 @@
+cli_args = dict(
+    cfg_time_str='20260813_140425',
+    config=None,
+    config_dir='configs',
+    custom_dataset_data_type='qa',
+    custom_dataset_infer_method=None,
+    custom_dataset_meta_path=None,
+    custom_dataset_path='/mnt/tmx/aisbench_dataset/gsm8k_bimodal_2.jsonl',
+    datasets=None,
+    debug=False,
+    dir_time_str='20260813_140425',
+    dry_run=False,
+    dump_eval_details=False,
+    dump_extract_rate=False,
+    max_num_workers=1,
+    max_workers_per_gpu=1,
+    merge_ds=False,
+    mode='perf',
+    models=[
+        'vllm_api_chat_temp',
+    ],
+    num_prompts=None,
+    num_warmups=0,
+    pressure=False,
+    pressure_time=15,
+    reuse=None,
+    search=False,
+    summarizer='default_perf',
+    work_dir='./outputs/bimodal')
+datasets = [
+    [
+        dict(
+            abbr='gsm8k_bimodal_2',
+            eval_cfg=dict(
+                evaluator=dict(
+                    type=
+                    'ais_bench.benchmark.openicl.icl_evaluator.icl_hf_evaluator.AccEvaluator'
+                ),
+                pred_role='BOT'),
+            infer_cfg=dict(
+                inferencer=dict(
+                    batch_size=16,
+                    mode='perf',
+                    model_cfg=dict(
+                        abbr='vllm-api-stream-chat',
+                        api_key='',
+                        attr='service',
+                        batch_size=16,
+                        generation_kwargs=dict(ignore_eos=True, temperature=0),
+                        host_ip='90.90.97.39',
+                        host_port=31053,
+                        max_out_len=2048,
+                        model='Qwen3',
+                        path='/mnt/weight/Qwen3-30B-A3B-W8A8',
+                        request_rate=1.5,
+                        retry=2,
+                        type=
+                        'ais_bench.benchmark.models.api_models.vllm_custom_api_chat.VLLMCustomAPIChatStream'
+                    ),
+                    output_json_filepath='./outputs/bimodal/20260813_140425',
+                    pressure_time=15,
+                    type=
+                    'ais_bench.benchmark.openicl.icl_inferencer.icl_gen_inferencer.GenInferencer'
+                ),
+                prompt_template=dict(
+                    template='Question: {question}\nAnswer: {answer}',
+                    type=
+                    'ais_bench.benchmark.openicl.icl_prompt_template.icl_prompt_template.PromptTemplate'
+                ),
+                retriever=dict(
+                    prompt_template=dict(
+                        template='Question: {question}\nAnswer: {answer}',
+                        type=
+                        'ais_bench.benchmark.openicl.icl_prompt_template.icl_prompt_template.PromptTemplate'
+                    ),
+                    type=
+                    'ais_bench.benchmark.openicl.icl_retriever.icl_zero_retriever.ZeroRetriever'
+                )),
+            meta_path=None,
+            path='/mnt/tmx/aisbench_dataset/gsm8k_bimodal_2.jsonl',
+            reader_cfg=dict(
+                input_columns=[
+                    'question',
+                    'max_out_len',
+                ],
+                output_column='answer'),
+            type='ais_bench.benchmark.datasets.custom.CustomDataset'),
+    ],
+]
+models = [
+    dict(
+        abbr='vllm-api-stream-chat',
+        api_key='',
+        attr='service',
+        batch_size=16,
+        generation_kwargs=dict(ignore_eos=True, temperature=0),
+        host_ip='90.90.97.39',
+        host_port=31053,
+        max_out_len=2048,
+        model='Qwen3',
+        path='/mnt/weight/Qwen3-30B-A3B-W8A8',
+        request_rate=1.5,
+        retry=2,
+        type=
+        'ais_bench.benchmark.models.api_models.vllm_custom_api_chat.VLLMCustomAPIChatStream'
+    ),
+]
+work_dir = './outputs/bimodal/20260813_140425'

@@ -1,0 +1,146 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm-p1
+  labels:
+    app: vllm-p1
+    ring-controller.atlas: ascend-910b
+    job-name: vllm-ly-p1-1779093072151bf8a9402
+  annotations:
+    sp-block: '16'
+  namespace: vllm-ly
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm-p1
+  template:
+    metadata:
+      labels:
+        fault-scheduling: grace
+        fault-retry-times: '10000'
+        app: vllm-p1
+        ring-controller.atlas: ascend-910b
+    spec:
+      schedulerName: volcano
+      nodeSelector:
+        accelerator: huawei-Ascend910
+        accelerator-type: module-a3-16
+      terminationGracePeriodSeconds: 0
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 1001
+      containers:
+      - image: mindie-motor-vllm:dev-26.0.0.B130-800I-A3-py311-Ubuntu24.04-lts-aarch64
+        imagePullPolicy: IfNotPresent
+        name: vllm
+        securityContext:
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: Unconfined
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: CONFIGMAP_PATH
+          value: /mnt/configmap
+        - name: CONFIG_PATH
+          value: /usr/local/Ascend/pyMotor/conf
+        - name: ROLE
+          value: prefill
+        - name: JOB_NAME
+          value: vllm-ly-p1-1779093072151bf8a9402
+        - name: CONTROLLER_SERVICE
+          value: mindie-motor-controller-service.vllm-ly.svc.cluster.local
+        - name: COORDINATOR_SERVICE
+          value: mindie-motor-coordinator-service.vllm-ly.svc.cluster.local
+        command:
+        - /bin/bash
+        - -c
+        - " source /mnt/configmap/boot.sh; \n "
+        resources:
+          requests:
+            memory: 64Gi
+            cpu: '16'
+            huawei.com/Ascend910: 16
+          limits:
+            memory: 256Gi
+            cpu: '64'
+            huawei.com/Ascend910: 16
+        volumeMounts:
+        - name: data
+          mountPath: /data
+          readOnly: true
+        - name: motor-config
+          mountPath: /mnt/configmap
+        - name: queue-schedule
+          mountPath: /var/queue_schedule
+        - name: dshm
+          mountPath: /dev/shm
+        - name: coredump
+          mountPath: /var/coredump
+        - name: mnt
+          mountPath: /mnt
+        - name: hccn-tool
+          mountPath: /usr/local/Ascend/driver/tools/hccn_tool
+        - name: hccn-conf
+          mountPath: /etc/hccn.conf
+        - name: weight-mount
+          mountPath: /mnt/weight/
+        - name: plog-path
+          mountPath: /root/ascend/log
+        - name: ascend-driver
+          mountPath: /usr/local/Ascend/driver
+        - name: rdma
+          mountPath: /dev/infiniband
+        - name: hisi-hdc
+          mountPath: /dev/hisi_hdc
+      volumes:
+      - name: data
+        hostPath:
+          path: /data
+      - name: motor-config
+        configMap:
+          name: motor-config
+          defaultMode: 360
+      - name: queue-schedule
+        hostPath:
+          path: /var/queue_schedule
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 4Gi
+      - name: coredump
+        hostPath:
+          path: /var/coredump
+          type: DirectoryOrCreate
+      - name: mnt
+        hostPath:
+          path: /mnt
+      - name: hccn-tool
+        hostPath:
+          path: /usr/local/Ascend/driver/tools/hccn_tool
+      - name: hccn-conf
+        hostPath:
+          path: /etc/hccn.conf
+      - name: weight-mount
+        hostPath:
+          path: /mnt/weight/
+      - name: plog-path
+        hostPath:
+          path: /root/ascend/log
+          type: DirectoryOrCreate
+      - name: ascend-driver
+        hostPath:
+          path: /usr/local/Ascend/driver
+      - name: rdma
+        hostPath:
+          path: /dev/infiniband
+      - name: hisi-hdc
+        hostPath:
+          path: /dev/hisi_hdc

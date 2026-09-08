@@ -1,0 +1,14 @@
+# Python 缓存与产物
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# 测试结果与请求输出（不上传）
+outputs/
+request_out/
+
+# 日志
+*.log

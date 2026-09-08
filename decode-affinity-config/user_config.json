@@ -1,0 +1,100 @@
+{
+  "version": "v2.0",
+  "motor_deploy_config": {
+    "p_instances_num": 2,
+    "d_instances_num": 4,
+    "single_p_instance_pod_num": 1,
+    "single_d_instance_pod_num": 1,
+    "p_pod_npu_num": 1,
+    "d_pod_npu_num": 1,
+    "image_name": "80.48.37.110:5000/mindie-motor-vllm:dev-26.1.0.B135-800I-A2-py311-Ubuntu24.04-lts-aarch64",
+    "job_id": "mindie-tmx",
+    "hardware_type": "800I_A2",
+    "weight_mount_path": "/mnt/weight/",
+    "coordinator_infer_node_port": 31053,
+    "prefill_node_selector": {"kubernetes.io/hostname": "node-37-111"},
+    "decode_node_selector": {"kubernetes.io/hostname": "node-37-111"}
+  },
+  "motor_controller_config": {},
+  "motor_coordinator_config": {
+    "logging_config": {
+      "log_level": "DEBUG",
+      "log_max_line_length": 8192
+    },
+    "scheduler_config": {
+      "scheduler_type": "load_balance",
+      "decode_kv_request": false
+
+    }
+  },
+  "motor_engine_prefill_config": {
+    "engine_type": "vllm",
+    "motor_nodemanger_config": {},
+    "engine_config": {
+      "served_model_name": "Qwen3",
+      "model": "/mnt/weight/Qwen3-30B-A3B-W8A8",
+      "enable-prefix-caching": true,
+      "gpu_memory_utilization": 0.9,
+      "data_parallel_size": 1,
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "data_parallel_rpc_port": 9000,
+      "enable_expert_parallel": false,
+      "enforce-eager": true,
+      "max_model_len": 131072,
+      "kv_transfer_config": {
+        "kv_connector": "MooncakeConnectorV1",
+        "kv_buffer_device": "npu",
+        "kv_role": "kv_producer",
+        "kv_parallel_size": 1,
+        "kv_port": "30001",
+        "engine_id": "0",
+        "kv_rank": 0,
+        "kv_connector_extra_config": {}
+      },
+      "kv-events-config": {
+        "publisher": "zmq",
+        "enable_kv_cache_events": true,
+        "endpoint": "tcp://*:5557",
+        "topic": "kv-events",
+        "replay_endpoint": "tcp://*:6667"
+      }
+    }
+  },
+  "motor_engine_decode_config": {
+    "engine_type": "vllm",
+    "motor_nodemanger_config": {},
+    "engine_config": {
+      "served_model_name": "Qwen3",
+      "model": "/mnt/weight/Qwen3-30B-A3B-W8A8",
+      "enable-prefix-caching": true,
+      "gpu_memory_utilization": 0.9,
+      "data_parallel_size": 1,
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "data_parallel_rpc_port": 9000,
+      "enable_expert_parallel": false,
+      "max_model_len": 131072,
+      "kv_transfer_config": {
+        "kv_connector": "MooncakeConnectorV1",
+        "kv_buffer_device": "npu",
+        "kv_role": "kv_consumer",
+        "kv_parallel_size": 1,
+        "kv_port": "30001",
+        "engine_id": "0",
+        "kv_rank": 0,
+        "kv_connector_extra_config": {}
+      }
+    }
+  },
+  "kv_conductor_config": {
+    "store_backend": "Mooncake",
+    "model_path": "/mnt/weight/Qwen3-30B-A3B-W8A8",
+    "engine_type": "vLLM",
+    "block_size": 128,
+    "xpu_endpoint": "tcp://*:5557",
+    "replay_endpoint": "tcp://*:6667",
+    "http_server_port": 13333,
+    "re_register_interval_sec": 30
+  }
+}

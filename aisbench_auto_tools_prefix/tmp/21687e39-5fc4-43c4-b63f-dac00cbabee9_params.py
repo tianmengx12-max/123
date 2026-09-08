@@ -1,0 +1,133 @@
+cli_args = dict(
+    cfg_time_str='20260827_114758',
+    config=None,
+    config_dir='configs',
+    custom_dataset_data_type=None,
+    custom_dataset_infer_method=None,
+    custom_dataset_meta_path=None,
+    custom_dataset_path=None,
+    datasets=[
+        'sharegpt_gen',
+    ],
+    debug=True,
+    dir_time_str='20260827_114758',
+    dry_run=False,
+    dump_eval_details=False,
+    dump_extract_rate=False,
+    max_num_workers=1,
+    max_workers_per_gpu=1,
+    merge_ds=False,
+    mode='perf',
+    models=[
+        'vllm_api_stream_chat_multiturn',
+    ],
+    num_prompts=2000,
+    num_warmups=0,
+    pressure=False,
+    pressure_time=15,
+    reuse=None,
+    search=False,
+    summarizer='default_perf',
+    work_dir='./outputs/sharegpt')
+datasets = [
+    [
+        dict(
+            abbr='sharegpt',
+            disable_shuffle=True,
+            eval_cfg=dict(
+                evaluator=dict(
+                    type=
+                    'ais_bench.benchmark.datasets.sharegpt.ShareGPTEvaluator')
+            ),
+            infer_cfg=dict(
+                inferencer=dict(
+                    batch_size=40,
+                    infer_mode='every',
+                    mode='perf',
+                    model_cfg=dict(
+                        abbr='vllm-multiturn-api-chat-stream',
+                        api_key='',
+                        attr='service',
+                        batch_size=40,
+                        generation_kwargs=dict(
+                            ignore_eos=False, temperature=0.01),
+                        host_ip='80.48.37.110',
+                        host_port=31053,
+                        max_out_len=20480,
+                        model='Qwen3',
+                        path='/mnt/weight/Qwen3-30B-A3B-W8A8',
+                        pred_postprocessor=dict(
+                            type=
+                            'ais_bench.benchmark.utils.postprocess.model_postprocessors.extract_non_reasoning_content'
+                        ),
+                        request_rate=0,
+                        retry=2,
+                        stream=True,
+                        trust_remote_code=False,
+                        type=
+                        'ais_bench.benchmark.models.api_models.vllm_custom_api_chat.VLLMCustomAPIChat',
+                        url=''),
+                    output_json_filepath='./outputs/sharegpt/20260827_114758',
+                    pressure_time=15,
+                    type=
+                    'ais_bench.benchmark.openicl.icl_inferencer.icl_multiturn_inferencer.MultiTurnGenInferencer'
+                ),
+                prompt_template=dict(
+                    template=dict(round=[
+                        dict(prompt='{question}', role='HUMAN'),
+                        dict(prompt='{answer}', role='BOT'),
+                    ]),
+                    type=
+                    'ais_bench.benchmark.openicl.icl_prompt_template.icl_prompt_template_multiturn.MultiTurnPromptTemplate'
+                ),
+                retriever=dict(
+                    prompt_template=dict(
+                        template=dict(round=[
+                            dict(prompt='{question}', role='HUMAN'),
+                            dict(prompt='{answer}', role='BOT'),
+                        ]),
+                        type=
+                        'ais_bench.benchmark.openicl.icl_prompt_template.icl_prompt_template_multiturn.MultiTurnPromptTemplate'
+                    ),
+                    type=
+                    'ais_bench.benchmark.openicl.icl_retriever.icl_zero_retriever.ZeroRetriever'
+                )),
+            model_path='/mnt/weight/Qwen3-30B-A3B-W8A8',
+            path=
+            'ais_bench/datasets/sharegpt/ShareGPT_V3_unfiltered_cleaned_split.json',
+            reader_cfg=dict(
+                input_columns=[
+                    'question',
+                    'answer',
+                ],
+                output_column='answer',
+                test_range='[:2000]'),
+            trust_remote_code=False,
+            type='ais_bench.benchmark.datasets.sharegpt.ShareGPTDataset'),
+    ],
+]
+models = [
+    dict(
+        abbr='vllm-multiturn-api-chat-stream',
+        api_key='',
+        attr='service',
+        batch_size=40,
+        generation_kwargs=dict(ignore_eos=False, temperature=0.01),
+        host_ip='80.48.37.110',
+        host_port=31053,
+        max_out_len=20480,
+        model='Qwen3',
+        path='/mnt/weight/Qwen3-30B-A3B-W8A8',
+        pred_postprocessor=dict(
+            type=
+            'ais_bench.benchmark.utils.postprocess.model_postprocessors.extract_non_reasoning_content'
+        ),
+        request_rate=0,
+        retry=2,
+        stream=True,
+        trust_remote_code=False,
+        type=
+        'ais_bench.benchmark.models.api_models.vllm_custom_api_chat.VLLMCustomAPIChat',
+        url=''),
+]
+work_dir = './outputs/sharegpt/20260827_114758'

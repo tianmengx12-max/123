@@ -1,0 +1,122 @@
+{
+  "version": "v2.0",
+  "motor_deploy_config": {
+    "p_instances_num": 1,
+    "d_instances_num": 1,
+    "single_p_instance_pod_num": 1,
+    "single_d_instance_pod_num": 2,
+    "p_pod_npu_num": 16,
+    "d_pod_npu_num": 16,
+    "image_name": "mindie-motor-vllm:3.0.0-800I-A3-py3.11-Ubuntu24.04-lts-aarch64",
+    "job_id": "mindie-autotest",
+    "hardware_type": "800I_A3",
+    "deploy_mode": "multi_deployment",
+    "weight_mount_path": "/home/data"
+  },
+  "motor_controller_config": {},
+  "motor_coordinator_config": {},
+  "motor_engine_prefill_config": {
+    "engine_type": "vllm",
+    "motor_nodemanger_config": {},
+    "model_config": {
+      "model_name": "dsv3_1",
+      "model_path": "/home/data/DeepSeek-V3.1_w8a8mix_mtp/",
+      "npu_mem_utils": 0.9,
+      "parallel_config": {
+        "dp_size": 2,
+        "tp_size": 8,
+        "pp_size": 1,
+        "enable_ep": true,
+        "dp_rpc_port": 9000,
+        "world_size": 16
+      }
+    },
+    "engine_config": {
+      "dtype": "bfloat16",
+    "model-loader-extra-config": {"enable_multithread_load": true, "num_threads": 8},
+      "enforce-eager": true,
+      "trust-remote-code": true,
+      "max_model_len": 73000,
+      "max-num-batched-tokens": 16384,
+      "max-num-seqs": 16,
+      "quantization": "ascend",
+      "seed": 1024,
+      "no-enable-prefix-caching": false,
+      "distributed-executor-backend": "mp",
+      "speculative-config": {
+        "num_speculative_tokens": 1,
+        "method": "deepseek_mtp"
+      },
+      "additional-config": {
+        "recompute_scheduler_enable": true
+      },
+      "kv_transfer_config": {
+        "kv_connector": "MooncakeLayerwiseConnector",
+        "kv_buffer_device": "npu",
+        "kv_role": "kv_producer",
+        "kv_parallel_size": 1,
+        "kv_port": "30001",
+        "engine_id": "0",
+        "kv_rank": 0,
+        "kv_connector_module_path": "vllm_ascend.distributed.mooncake_layerwise_connector",
+        "kv_connector_extra_config": {
+          "use_ascend_direct": true
+        }
+      }
+    }
+  },
+  "motor_engine_decode_config": {
+    "engine_type": "vllm",
+    "motor_nodemanger_config": {},
+    "model_config": {
+      "model_name": "dsv3_1",
+      "model_path": "/home/data/DeepSeek-V3.1_w8a8mix_mtp/",
+      "npu_mem_utils": 0.9,
+      "parallel_config": {
+        "dp_size": 32,
+        "tp_size": 1,
+        "pp_size": 1,
+        "enable_ep": true,
+        "dp_rpc_port": 9000,
+        "world_size": 32
+      }
+    },
+    "engine_config": {
+      "dtype": "bfloat16",
+    "model-loader-extra-config": {"enable_multithread_load": true, "num_threads": 8},
+      "trust-remote-code": true,
+      "max_model_len": 73000,
+      "max-num-batched-tokens": 256,
+      "max-num-seqs": 24,
+      "quantization": "ascend",
+      "seed": 1024,
+      "no-enable-prefix-caching": false,
+      "compilation_config": {
+        "cudagraph_capture_sizes": [4, 8, 16, 32, 48, 64, 80, 96],
+        "cudagraph_mode": "FULL_DECODE_ONLY"
+      },
+      "distributed-executor-backend": "mp",
+      "speculative-config": {
+        "num_speculative_tokens": 3,
+        "method": "deepseek_mtp"
+      },
+      "additional-config": {
+        "recompute_scheduler_enable": true,
+        "lm_head_tensor_parallel_size": 16
+      },
+      "kv_transfer_config": {
+        "kv_connector": "MooncakeLayerwiseConnector",
+        "kv_buffer_device": "npu",
+        "kv_role": "kv_consumer",
+        "kv_parallel_size": 1,
+        "kv_port": "30001",
+        "engine_id": "0",
+        "kv_rank": 0,
+        "kv_connector_module_path": "vllm_ascend.distributed.mooncake_layerwise_connector",
+        "kv_connector_extra_config": {
+          "use_ascend_direct": true
+        }
+      }
+    }
+  }
+}

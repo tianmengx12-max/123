@@ -1,0 +1,157 @@
+{
+  "version": "v2.0",
+  "motor_deploy_config": {
+    "p_instances_num": 1,
+    "d_instances_num": 1,
+    "single_p_instance_pod_num": 1,
+    "single_d_instance_pod_num": 1,
+    "p_pod_npu_num": 8,
+    "d_pod_npu_num": 8,
+    "image_name": "80.48.37.110:5000/mindie-motor-vllm:dev-26.1.0.B135-800I-A2-py311-Ubuntu24.04-lts-aarch64",
+    "job_id": "mindie-tmx",
+    "hardware_type": "800I_A2",
+    "weight_mount_path": "/mnt/weight/",
+    "coordinator_infer_node_port": 31053
+  },
+  "motor_controller_config": {},
+  "motor_coordinator_config": {
+    "logging_config": {
+      "log_level": "DEBUG",
+      "log_max_line_length": 8192
+    },
+    "scheduler_config": {
+      "scheduler_type": "load_balance",
+      "decode_affinity_enabled": false,
+      "decode_kv_request_enabled": true
+    }
+  },
+  "motor_engine_prefill_config": {
+    "engine_type": "vllm",
+    "motor_nodemanger_config": {},
+    "engine_config": {
+      "data_parallel_size": 8,
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "data_parallel_rpc_port": 9000,
+      "served_model_name": "dsv4",
+      "model": "/mnt/weight/DeepSeek-V4-Flash-0731",
+      "seed": 1024,
+      "enable_expert_parallel": true,
+      "max-model-len": 262144,
+      "max-num-batched-tokens": 4096,
+      "max-num-seqs": 16,
+      "block-size": 128,
+      "enforce-eager": true,
+      "async-scheduling": true,
+      "no_disable_hybrid_kv_cache_manager": true,
+      "no-enable-prefix-caching": true,
+      "trust-remote-code": true,
+      "gpu_memory_utilization": 0.9,
+      "quantization": "fp8",
+      "safetensors-load-strategy": "prefetch",
+      "model-loader-extra-config": {
+        "enable_multithread_load": "true",
+        "num_threads": 128
+      },
+      "tokenizer-mode": "deepseek_v4",
+      "tool-call-parser": "deepseek_v4",
+      "enable-auto-tool-choice": true,
+      "reasoning-parser": "deepseek_v4",
+      "speculative-config": {
+        "num_speculative_tokens": 1,
+        "method": "mtp",
+        "enforce_eager": true
+      },
+      "additional-config": {
+        "enable_cpu_binding": true,
+        "enable_shared_expert_dp": true
+      },
+      "kv_transfer_config": {
+        "kv_connector": "MooncakeConnectorV1",
+        "kv_role": "kv_producer",
+        "kv_port": "30000",
+        "engine_id": "0"
+      },
+      "kv-events-config": {
+        "publisher": "zmq",
+        "enable_kv_cache_events": true,
+        "endpoint": "tcp://:5557",
+        "topic": "kv-events",
+        "replay_endpoint": "tcp://:6667"
+      }
+    }
+  },
+  "motor_engine_decode_config": {
+    "engine_type": "vllm",
+    "motor_nodemanger_config": {},
+    "engine_config": {
+      "data_parallel_size": 8,
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "data_parallel_rpc_port": 9000,
+      "served_model_name": "dsv4",
+      "model": "/mnt/weight/DeepSeek-V4-Flash-0731",
+      "seed": 1024,
+      "enable_expert_parallel": true,
+      "max-model-len": 262144,
+      "max-num-batched-tokens": 60,
+      "max-num-seqs": 30,
+      "async-scheduling": true,
+      "block-size": 128,
+      "enable-prefix-caching": true,
+      "no_disable_hybrid_kv_cache_manager": true,
+      "safetensors-load-strategy": "prefetch",
+      "model-loader-extra-config": {
+        "enable_multithread_load": "true",
+        "num_threads": 128
+      },
+      "trust-remote-code": true,
+      "tokenizer-mode": "deepseek_v4",
+      "tool-call-parser": "deepseek_v4",
+      "enable-auto-tool-choice": true,
+      "reasoning-parser": "deepseek_v4",
+      "gpu_memory_utilization": 0.9,
+      "quantization": "fp8",
+      "compilation-config": {
+        "cudagraph_mode": "FULL_DECODE_ONLY"
+      },
+      "speculative-config": {
+        "num_speculative_tokens": 1,
+        "method": "mtp",
+        "enforce_eager": true
+      },
+      "additional-config": {
+        "enable_cpu_binding": true,
+        "multistream_overlap_shared_expert": true,
+        "recompute_scheduler_enable": true,
+        "ascend_compilation_config": {
+          "enable_npugraph_ex": true,
+          "enable_static_kernel": false
+        }
+      },
+      "kv_transfer_config": {
+        "kv_connector": "MooncakeConnectorV1",
+        "kv_role": "kv_consumer",
+        "kv_port": "30400",
+        "engine_id": "4"
+      },
+      "kv-events-config": {
+        "publisher": "zmq",
+        "enable_kv_cache_events": true,
+        "endpoint": "tcp://:5557",
+        "topic": "kv-events",
+        "replay_endpoint": "tcp://:6667"
+      }
+    }
+  },
+  "kv_conductor_config": {
+    "store_backend": "Mooncake",
+    "model_path": "/mnt/weight/DeepSeek-V4-Flash-0731",
+    "engine_type": "vLLM",
+    "block_size": 128,
+    "xpu_endpoint": "tcp://:5557",
+    "replay_endpoint": "tcp://:6667",
+    "http_server_port": 13333,
+    "re_register_interval_sec": 30
+  }
+}

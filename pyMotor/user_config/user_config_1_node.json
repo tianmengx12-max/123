@@ -1,0 +1,163 @@
+{
+  "version": "v2.0",
+  "motor_deploy_config": {
+    "p_instances_num": 1,
+    "d_instances_num": 1,
+    "single_p_instance_pod_num": 1,
+    "single_d_instance_pod_num": 1,
+    "p_pod_npu_num": 2,
+    "d_pod_npu_num": 2,
+    "image_name": "mindie-motor-vllm:dev-26.0.0.B130-800I-A3-py311-Ubuntu24.04-lts-aarch64-mooncake",
+    "job_id": "mindie-tmx",
+    "hardware_type": "800I_A3",
+    "weight_mount_path": "/mnt/weight/",
+    "deploy_mode": "multi_deployment"
+  },
+  "motor_controller_config": {
+    "standby_config": {"enable_master_standby": false}
+  },
+  "motor_coordinator_config": {
+    "standby_config": {"enable_master_standby": false},
+    "scheduler_config": {
+      "scheduler_type": "kv_cache_affinity"
+    },
+    "token_sampling_config": {
+      "enabled": true,
+      "interval_seconds": 30.0,
+      "logprobs_count": 1
+    },
+    "prometheus_metrics_config": {
+      "reuse_time": 3,
+      "pool_metrics_enable": false,
+      "pool_metrics_endpoint": "http://kvp-master.mindie-tmx.svc.cluster.local:9003/metrics"
+    }
+  },
+  "motor_engine_prefill_config": {
+    "engine_type": "vllm",
+    "motor_nodemanger_config": {},
+    "health_check_config": {
+      "enable_virtual_inference": false,
+      "npu_usage_threshold": 10
+    },
+    "model_config": {
+      "model_name": "qwen",
+      "model_path": "/mnt/weight/Qwen3-30B-A3B-W8A8",
+      "npu_mem_utils": 0.93,
+      "parallel_config": {
+        "dp_size": 1,
+        "tp_size": 1,
+        "pp_size": 1,
+        "enable_ep": false,
+        "dp_rpc_port": 9000
+      }
+    },
+    "engine_config": {
+      "enforce-eager": true,
+      "max_model_len": 2048,
+      "enable-auto-tool-choice": true,
+      "tool-call-parser": "hermes",
+      "enable-prefix-caching": true,
+      "kv-events-config": {
+        "publisher": "zmq",
+        "enable_kv_cache_events": true,
+        "endpoint": "tcp://*:5557",
+        "topic": "kv-events",
+        "replay_endpoint": "tcp://*:6667"
+      },
+      "kv_transfer_config": {
+        "kv_connector": "MultiConnector",
+        "kv_role": "kv_producer",
+        "kv_connector_extra_config": {
+          "use_layerwise": true,
+          "connectors": [
+            {
+              "kv_connector": "MooncakeLayerwiseConnector",
+              "kv_role": "kv_producer",
+              "kv_port": "30001",
+              "kv_connector_extra_config": {
+                "use_ascend_direct": true,
+                "send_type": "PUT"
+              }
+            },
+            {
+              "kv_connector": "AscendStoreConnector",
+              "kv_role": "kv_producer",
+              "kv_connector_extra_config": {
+                "lookup_rpc_port": "0",
+                "backend": "mooncake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "motor_engine_decode_config": {
+    "motor_nodemanger_config": {},
+    "engine_type": "vllm",
+    "health_check_config": {
+      "enable_virtual_inference": false,
+      "npu_usage_threshold": 10
+    },
+    "model_config": {
+      "model_name": "qwen",
+      "model_path": "/mnt/weight/Qwen3-30B-A3B-W8A8",
+      "npu_mem_utils": 0.9,
+      "parallel_config": {
+        "dp_size": 1,
+        "tp_size": 1,
+        "pp_size": 1,
+        "enable_ep": false,
+        "dp_rpc_port": 9000
+      }
+    },
+    "engine_config": {
+      "max_model_len": 2048,
+      "enable-auto-tool-choice": true,
+      "tool-call-parser": "hermes",
+      "enable-prefix-caching": true,
+      "kv_transfer_config": {
+        "kv_connector": "MultiConnector",
+        "kv_role": "kv_consumer",
+        "kv_connector_extra_config": {
+          "use_layerwise": true,
+          "connectors": [
+            {
+              "kv_connector": "MooncakeLayerwiseConnector",
+              "kv_role": "kv_consumer",
+              "kv_port": "30001",
+              "kv_connector_extra_config": {
+                "use_ascend_direct": true,
+                "send_type": "PUT"
+              }
+            },
+            {
+              "kv_connector": "AscendStoreConnector",
+              "kv_role": "kv_consumer",
+              "kv_connector_extra_config": {
+                "lookup_rpc_port": "1",
+                "backend": "mooncake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "kv_cache_pool_config": {
+    "metadata_server": "P2PHANDSHAKE",
+    "protocol": "ascend",
+    "device_name": "",
+    "global_segment_size": "1GB",
+    "eviction_high_watermark_ratio": 0.9,
+    "eviction_ratio": 0.1
+  },
+  "kv_conductor_config": {
+    "kvevent_instance": {
+      "mooncake_master": {
+        "type": "Mooncake"
+      }
+    },
+    "http_server_port": 13333
+  }
+}
